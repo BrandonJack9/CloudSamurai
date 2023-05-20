@@ -4,6 +4,8 @@ class Start extends Phaser.Scene
     currentPlayer;
     player2;
     player1;
+    movingPlatform;
+    platforms;
 
     preload ()
     {
@@ -11,25 +13,41 @@ class Start extends Phaser.Scene
         this.load.image('sky', 'sky.png');
         this.load.image('ground', 'ground.png');
         this.load.image('dude', 'dude.png' );
+        this.load.image('platform', 'cloudplatform.png' );
     }
 
     create ()
     {
+        this.platforms = this.physics.add.staticGroup();
+
+        //this.platforms.create(200, 350, 'ground').setScale(.25).refreshBody();
+
+        
+
+
         this.add.image(400, 300, 'sky');
 
         const ground = this.physics.add.staticGroup();
 
         ground.create(400, 568, 'ground').setScale(1).refreshBody();
 
-        this.player1 = this.physics.add.sprite(250, 200, 'dude').setBounce(0.2).setCollideWorldBounds(true);
+        this.player1 = this.physics.add.sprite(230, 200, 'dude').setBounce(0.2).setCollideWorldBounds(true);
         this.player2 = this.physics.add.sprite(500, 200, 'dude').setTint(0xff5555).setBounce(0.2).setCollideWorldBounds(true);
 
         this.player1.name = 'Purple';
         this.player2.name = 'Red';
 
-        this.player2.setPushable(false);
+        //this.player2.setPushable(false);
 
         this.currentPlayer = this.player1;
+
+        this.platforms.create(400, 200, 'platform').setScale(.4).refreshBody();
+
+        this.movingPlatform = this.physics.add.image(280, 350, 'platform');
+        this.movingPlatform.setScale(.4);
+        this.movingPlatform.setImmovable(true);
+        this.movingPlatform.body.allowGravity = false;
+        this.movingPlatform.setVelocityX(50);
 
         /*
         this.anims.create({
@@ -58,6 +76,7 @@ class Start extends Phaser.Scene
         this.physics.add.collider(this.player2, ground);
 
         this.physics.add.collider(this.player1, this.player2);
+        this.physics.add.collider(this.player2, this.movingPlatform);
 
         // this.physics.add.collider(player2, player1);
 
@@ -80,6 +99,27 @@ class Start extends Phaser.Scene
         }, this);
 
         this.add.text(10, 10, 'Click to change character', { fontSize: '22px', fill: 'black' });
+
+        this.physics.add.collider(this.currentPlayer, this.movingPlatform);
+        this.physics.add.collider(
+            this.currentPlayer,
+            this.platforms,
+            null,
+            (currentPlayer, platforms) =>
+            {
+                return currentPlayer.body.velocity.y >= 0;
+            });
+
+            this.physics.add.collider(
+                this.player2,
+                this.platforms,
+                null,
+                (player2, platforms) =>
+                {
+                    return player2.body.velocity.y >= 0;
+                });
+
+            
     }
 
     update ()
@@ -109,6 +149,15 @@ class Start extends Phaser.Scene
 
             window.showit = true;
         }
+
+        if (this.movingPlatform.x >= 700)
+        {
+            this.movingPlatform.setVelocityX(-50);
+        }
+        else if (this.movingPlatform.x <= 200)
+        {
+            this.movingPlatform.setVelocityX(50);
+        }
     }
 }
 
@@ -119,7 +168,7 @@ const config = {
     physics: {
         default: 'arcade',
         arcade: {
-            gravity: { y: 200 },
+            gravity: { y: 170 },
             debug: true
         }
     },
