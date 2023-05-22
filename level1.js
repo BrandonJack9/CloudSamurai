@@ -1,7 +1,7 @@
-class Start extends Phaser.Scene
+class level1 extends Phaser.Scene
 {
     constructor() {
-        super("Start")
+        super("level1")
     }
 
     cursors;
@@ -39,10 +39,6 @@ class Start extends Phaser.Scene
     {
         
         
-        //this.platforms.create(200, 350, 'ground').setScale(.25).refreshBody();
-        
-        this.playerdead = false;
-        
         
         this.add.image(500, 400, 'sky').setScale(1.4);
 
@@ -53,26 +49,12 @@ class Start extends Phaser.Scene
         
         
         this.player1 = this.physics.add.sprite(230, 600, 'samurai').setBounce(0.2).setCollideWorldBounds(true);
-        this.player2 = this.physics.add.sprite(600, 600, 'samurai').setTint(0xff5555).setBounce(0.2).setCollideWorldBounds(true);
+        
 
         this.player1.name = 'Purple';
-        this.player2.name = 'Red';
-
-        //this.player2.setPushable(false);
+        
 
         this.currentPlayer = this.player1;
-
-        //platform mechanics
-
-        this.platforms = this.physics.add.staticGroup();
-        this.platforms.create(400, 650, 'platform').setScale(.4).refreshBody();
-
-        this.movingPlatform = this.physics.add.image(280, 500, 'platform');
-        this.movingPlatform.setScale(.4);
-        this.movingPlatform.setImmovable(true);
-        this.movingPlatform.body.allowGravity = false;
-        this.movingPlatform.setVelocityX(50);
-
         
         //portal mechanics
 
@@ -99,24 +81,18 @@ class Start extends Phaser.Scene
         
        
 
-        this.port = this.physics.add.staticGroup();
-        this.port.create(750, 400, "portal1").setScale(.5).refreshBody();
-        this.add.sprite(750, 400, 'portal1')
-            .play('portal').setTint(0xff5555);
+        
         
         this.port2 = this.physics.add.staticGroup();
-        
-        this.physics.add.collider(this.port, this.player2, this.destroyghost, () => {
-            
-            this.port2.create(200, 400, "portal1").setScale(.5).refreshBody();
-            this.add.sprite(200, 400, 'portal1')
+        this.port2.create(950, 700, "portal1").setScale(.5).refreshBody();
+            this.add.sprite(950, 700, 'portal1')
             .play('portal');
-
-        } );
+        
+        
         
         this.physics.add.collider(this.currentPlayer, this.port2, () => {
             
-            this.time.delayedCall(200, () => this.scene.start('Scene2'));
+            this.time.delayedCall(200, () => this.scene.start('level2'));
 
         });
 
@@ -146,30 +122,21 @@ class Start extends Phaser.Scene
         this.cursors = this.input.keyboard.createCursorKeys();
 
         this.physics.add.collider(this.player1, ground);
-        this.physics.add.collider(this.player2, ground);
+        
 
-        this.physics.add.collider(this.player1, this.player2);
-        this.physics.add.collider(this.player2, this.movingPlatform);
+        
 
-        // this.physics.add.collider(player2, player1);
-
+        
         window.body1 = this.player1.body;
         window.physics = this.physics;
         window.showit = false;
 
-        this.input.on('pointerdown', () =>
-        {
+        
+            
+        this.currentPlayer = this.player1;
+            
 
-            if (this.currentPlayer === this.player1)
-            {
-                this.currentPlayer = this.player2;
-            }
-            else
-            {
-                this.currentPlayer = this.player1;
-            }
-
-        }, this);
+        
 
         
         
@@ -183,18 +150,11 @@ class Start extends Phaser.Scene
                 return currentPlayer.body.velocity.y >= 0;
             });
 
-            this.physics.add.collider(
-                this.player2,
-                this.platforms,
-                null,
-                (player2, platforms) =>
-                {
-                    return player2.body.velocity.y >= 0;
-                });
+            
 
        
         
-        this.add.text(10, 10, 'Click to change character', { fontSize: '22px', fill: 'black' });
+        this.add.text(30, 30, 'MOVE WITH THE ARROW KEYS', { fontSize: '44px', fill: 'black' });
 
         
 
@@ -234,17 +194,8 @@ class Start extends Phaser.Scene
             window.showit = true;
         }
 
-        if (this.movingPlatform.x >= 700)
-        {
-            this.movingPlatform.setVelocityX(-50);
-        }
-        else if (this.movingPlatform.x <= 200)
-        {
-            this.movingPlatform.setVelocityX(50);
-        }
+        
     }
 
-    destroyghost(player2, port){
-        player2.disableBody(true, true);
-    }
+    
 }
