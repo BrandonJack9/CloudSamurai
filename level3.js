@@ -116,7 +116,7 @@ class level3 extends Phaser.Scene
         
         this.physics.add.collider(this.currentPlayer, this.port2, () => {
             
-            this.time.delayedCall(200, () => this.scene.start('level3'));
+            this.time.delayedCall(200, () => this.scene.start('Reset'));
 
         });
 

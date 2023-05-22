@@ -12,7 +12,7 @@ const config = {
             //debug: true
         }
     },
-    scene: [ level1, level2, level3]
+    scene: [ SHGamesIntro, OpeningCutscene, GameMenu, level1, level2, level3, Reset]
 };
 
 const game = new Phaser.Game(config);
