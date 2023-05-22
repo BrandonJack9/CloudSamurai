@@ -6,6 +6,9 @@ class Start extends Phaser.Scene
     player1;
     movingPlatform;
     platforms;
+    playerdead;
+    port;
+    port2;
 
     preload ()
     {
@@ -33,10 +36,10 @@ class Start extends Phaser.Scene
         
 
         //this.platforms.create(200, 350, 'ground').setScale(.25).refreshBody();
-
         
-
-
+        this.playerdead = false;
+        
+        
         this.add.image(400, 300, 'sky');
 
         const ground = this.physics.add.staticGroup();
@@ -69,13 +72,6 @@ class Start extends Phaser.Scene
         
         //portal mechanics
 
-        const port = this.physics.add.staticGroup();
-        port.create(700, 50, "portal1").refreshBody();;
-        this.physics.add.collider(this.currentPlayer, port, () => {
-            this.time.delayedCall(200, () => this.scene.start('Scene2'));
-
-        });
-        
         this.anims.create({
             key: 'portal',
             frames: [
@@ -96,8 +92,32 @@ class Start extends Phaser.Scene
             repeat: -1
         });
 
+        
+       
+
+        this.port = this.physics.add.staticGroup();
+        this.port.create(700, 50, "portal1").setScale(.5).refreshBody();
         this.add.sprite(700, 50, 'portal1')
+            .play('portal').setTint(0xff5555);
+        
+        this.port2 = this.physics.add.staticGroup();
+        
+        this.physics.add.collider(this.port, this.player2, this.destroyghost, () => {
+            
+            this.port2.create(200, 50, "portal1").setScale(.5).refreshBody();
+            this.add.sprite(200, 50, 'portal1')
             .play('portal');
+
+        } );
+        
+        this.physics.add.collider(this.currentPlayer, this.port2, () => {
+            
+            this.time.delayedCall(200, () => this.scene.start('Scene2'));
+
+        });
+
+        
+        
         /*
         this.anims.create({
             key: 'left',
@@ -148,6 +168,7 @@ class Start extends Phaser.Scene
         }, this);
 
         
+        
         this.physics.add.collider(this.currentPlayer, this.movingPlatform);
         this.physics.add.collider(
             this.currentPlayer,
@@ -167,22 +188,29 @@ class Start extends Phaser.Scene
                     return player2.body.velocity.y >= 0;
                 });
 
+       
         
         this.add.text(10, 10, 'Click to change character', { fontSize: '22px', fill: 'black' });
 
+        
 
-            
+
     }
+
+    
 
     update ()
     {
-        if (this.cursors.left.isDown)
+        
+        
+
+        if (this.cursors.left.isDown && this.currentPlayer.scene)
         {
             this.currentPlayer.setVelocityX(-160);
 
             //this.currentPlayer.anims.play('left', true);
         }
-        else if (this.cursors.right.isDown)
+        else if (this.cursors.right.isDown && this.currentPlayer.scene)
         {
             this.currentPlayer.setVelocityX(160);
 
@@ -195,7 +223,7 @@ class Start extends Phaser.Scene
             //this.currentPlayer.anims.play('turn');
         }
 
-        if (this.cursors.up.isDown && this.currentPlayer.body.touching.down)
+        if (this.cursors.up.isDown && this.currentPlayer.body.touching.down && this.currentPlayer.scene)
         {
             this.currentPlayer.setVelocityY(-230);
 
@@ -210,6 +238,10 @@ class Start extends Phaser.Scene
         {
             this.movingPlatform.setVelocityX(50);
         }
+    }
+
+    destroyghost(player2, port){
+        player2.disableBody(true, true);
     }
 }
 
