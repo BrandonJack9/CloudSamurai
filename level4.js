@@ -1,7 +1,7 @@
-class level3 extends Phaser.Scene
+class level4 extends Phaser.Scene
 {
     constructor() {
-        super("level3")
+        super("level4")
     }
 
     cursors;
@@ -10,6 +10,7 @@ class level3 extends Phaser.Scene
     player1;
     movingPlatform;
     platforms;
+    islands;
     playerdead;
     port;
     port2;
@@ -21,6 +22,7 @@ class level3 extends Phaser.Scene
         this.load.image('ground', 'ground.png');
         this.load.image('samurai', 'samurai.png' );
         this.load.image('platform', 'cloudplatform.png' );
+        this.load.image('island', 'floatingisland.png' );
         this.load.image('portal1', 'portal1.png');
         this.load.image('portal2', 'portal2.png');
         this.load.image('portal3', 'portal3.png');
@@ -49,7 +51,8 @@ class level3 extends Phaser.Scene
         const ground = this.physics.add.staticGroup();
 
         ground.create(500, 900, 'ground').setScale(1.3).refreshBody();
-
+        
+    
         
         
         this.player1 = this.physics.add.sprite(230, 600, 'samurai').setBounce(0.2).setCollideWorldBounds(true);
@@ -66,6 +69,10 @@ class level3 extends Phaser.Scene
 
         this.platforms = this.physics.add.staticGroup();
         this.platforms.create(400, 650, 'platform').setScale(.4).refreshBody();
+        
+        this.islands = this.physics.add.staticGroup();
+        const island1 = this.islands.create(200, 380, 'island').refreshBody();
+        const island2 = this.islands.create(400, 260, 'island').refreshBody();
 
         this.movingPlatform = this.physics.add.image(280, 500, 'platform');
         this.movingPlatform.setScale(.4);
@@ -108,15 +115,15 @@ class level3 extends Phaser.Scene
         
         this.physics.add.collider(this.port, this.player2, this.destroyghost, () => {
             
-            this.port2.create(200, 400, "portal1").setScale(.5).refreshBody();
-            this.add.sprite(200, 400, 'portal1')
+            this.port2.create(750, 210, "portal1").setScale(.5).refreshBody();
+            this.add.sprite(750, 210, 'portal1')
             .play('portal');
 
         } );
         
         this.physics.add.collider(this.currentPlayer, this.port2, () => {
             
-            this.time.delayedCall(200, () => this.scene.start('level4'));
+            this.time.delayedCall(200, () => this.scene.start('level5'));
 
         });
 
@@ -148,6 +155,9 @@ class level3 extends Phaser.Scene
         this.physics.add.collider(this.player1, ground);
         this.physics.add.collider(this.player2, ground);
 
+        this.physics.add.collider(this.player1, ground);
+        this.physics.add.collider(this.player2, ground);
+
         this.physics.add.collider(this.player1, this.player2);
         this.physics.add.collider(this.player2, this.movingPlatform);
 
@@ -174,6 +184,9 @@ class level3 extends Phaser.Scene
         
         
         this.physics.add.collider(this.currentPlayer, this.movingPlatform);
+
+        this.physics.add.collider(this.currentPlayer, this.islands);
+        
         this.physics.add.collider(
             this.currentPlayer,
             this.platforms,
@@ -194,7 +207,7 @@ class level3 extends Phaser.Scene
 
        
         
-                this.add.text(30, 30, 'CLICK TO CHANGE CHARACTER', { fontSize: '44px', fill: 'black' });
+                //this.add.text(30, 30, 'CLICK TO CHANGE CHARACTER', { fontSize: '44px', fill: 'black' });
 
         
 

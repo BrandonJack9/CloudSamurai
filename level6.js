@@ -1,7 +1,7 @@
-class level3 extends Phaser.Scene
+class level6 extends Phaser.Scene
 {
     constructor() {
-        super("level3")
+        super("level6")
     }
 
     cursors;
@@ -10,9 +10,12 @@ class level3 extends Phaser.Scene
     player1;
     movingPlatform;
     platforms;
+    islands;
     playerdead;
     port;
     port2;
+    redenemy;
+    //redenemy2;
 
     preload ()
     {
@@ -21,6 +24,7 @@ class level3 extends Phaser.Scene
         this.load.image('ground', 'ground.png');
         this.load.image('samurai', 'samurai.png' );
         this.load.image('platform', 'cloudplatform.png' );
+        this.load.image('island', 'floatingisland.png' );
         this.load.image('portal1', 'portal1.png');
         this.load.image('portal2', 'portal2.png');
         this.load.image('portal3', 'portal3.png');
@@ -33,6 +37,7 @@ class level3 extends Phaser.Scene
         this.load.image('portal10', 'portal10.png');
         this.load.image('portal11', 'portal11.png');
         this.load.image('portal12', 'portal12.png');
+        this.load.image('enemy', 'enemy.png' );
     }
 
     create ()
@@ -49,10 +54,11 @@ class level3 extends Phaser.Scene
         const ground = this.physics.add.staticGroup();
 
         ground.create(500, 900, 'ground').setScale(1.3).refreshBody();
-
+        
+    
         
         
-        this.player1 = this.physics.add.sprite(230, 600, 'samurai').setBounce(0.2).setCollideWorldBounds(true);
+        this.player1 = this.physics.add.sprite(60, 100, 'samurai').setBounce(0.2).setCollideWorldBounds(true);
         this.player2 = this.physics.add.sprite(600, 600, 'samurai').setTint(0xff5555).setBounce(0.2).setCollideWorldBounds(true);
 
         this.player1.name = 'Purple';
@@ -66,14 +72,37 @@ class level3 extends Phaser.Scene
 
         this.platforms = this.physics.add.staticGroup();
         this.platforms.create(400, 650, 'platform').setScale(.4).refreshBody();
+        
+        this.islands = this.physics.add.staticGroup();
+        const island1 = this.islands.create(50, 380, 'island').refreshBody();
+        const island2 = this.islands.create(150, 300, 'island').refreshBody();
+        const island3 = this.islands.create(260, 280, 'island').refreshBody();
+        const island4 = this.islands.create(360, 160, 'island').refreshBody();
+        const island5 = this.islands.create(450, 60, 'island').refreshBody();
 
-        this.movingPlatform = this.physics.add.image(280, 500, 'platform');
+        
+        this.movingPlatform = this.physics.add.image(460, 500, 'platform');
         this.movingPlatform.setScale(.4);
         this.movingPlatform.setImmovable(true);
         this.movingPlatform.body.allowGravity = false;
-        this.movingPlatform.setVelocityX(50);
+        this.movingPlatform.setVelocityX(-70);
 
         
+        //enemy mechanics (see update functions for movement)
+
+        
+        this.redenemy2 = this.physics.add.image(250, 220, 'enemy');
+        this.redenemy2.setScale(.5);
+        this.redenemy2.setImmovable(true);
+        this.redenemy2.body.allowGravity = false;
+        this.redenemy2.setVelocityY(-50);
+
+        this.redenemy = this.physics.add.image(210, 550, 'enemy');
+        this.redenemy.setScale(.5);
+        this.redenemy.setImmovable(true);
+        this.redenemy.body.allowGravity = false;
+        this.redenemy.setVelocityX(50);
+
         //portal mechanics
 
         this.anims.create({
@@ -108,15 +137,27 @@ class level3 extends Phaser.Scene
         
         this.physics.add.collider(this.port, this.player2, this.destroyghost, () => {
             
-            this.port2.create(200, 400, "portal1").setScale(.5).refreshBody();
-            this.add.sprite(200, 400, 'portal1')
+            this.port2.create(360, 60, "portal1").setScale(.5).refreshBody();
+            this.add.sprite(360, 60, 'portal1')
             .play('portal');
 
         } );
+
+        this.physics.add.collider( this.redenemy, this.player2, this.destroyghost,  () => {
+            
+            this.time.delayedCall(200, () => this.scene.start('level6'));
+
+        });
+
+        this.physics.add.collider(this.player1, this.redenemy2,  () => {
+            
+            this.time.delayedCall(200, () => this.scene.start('level6'));
+
+        });
         
         this.physics.add.collider(this.currentPlayer, this.port2, () => {
             
-            this.time.delayedCall(200, () => this.scene.start('level4'));
+            this.time.delayedCall(200, () => this.scene.start('Reset'));
 
         });
 
@@ -148,6 +189,12 @@ class level3 extends Phaser.Scene
         this.physics.add.collider(this.player1, ground);
         this.physics.add.collider(this.player2, ground);
 
+        this.physics.add.collider(this.player1, this.redenemy);
+        this.physics.add.collider(this.player2, this.redenemy);
+
+        this.physics.add.collider(this.player1, this.redenemy2);
+        this.physics.add.collider(this.player2, this.redenemy2);
+
         this.physics.add.collider(this.player1, this.player2);
         this.physics.add.collider(this.player2, this.movingPlatform);
 
@@ -174,6 +221,9 @@ class level3 extends Phaser.Scene
         
         
         this.physics.add.collider(this.currentPlayer, this.movingPlatform);
+
+        this.physics.add.collider(this.currentPlayer, this.islands);
+        
         this.physics.add.collider(
             this.currentPlayer,
             this.platforms,
@@ -194,7 +244,7 @@ class level3 extends Phaser.Scene
 
        
         
-                this.add.text(30, 30, 'CLICK TO CHANGE CHARACTER', { fontSize: '44px', fill: 'black' });
+                //this.add.text(30, 30, 'CLICK TO CHANGE CHARACTER', { fontSize: '44px', fill: 'black' });
 
         
 
@@ -236,15 +286,35 @@ class level3 extends Phaser.Scene
 
         if (this.movingPlatform.x >= 700)
         {
-            this.movingPlatform.setVelocityX(-50);
+            this.movingPlatform.setVelocityX(-70);
         }
         else if (this.movingPlatform.x <= 200)
         {
-            this.movingPlatform.setVelocityX(50);
+            this.movingPlatform.setVelocityX(70);
         }
+
+        if (this.redenemy.x >= 700)
+        {
+            this.redenemy.setVelocityX(-50);
+        }
+        else if (this.redenemy.x <= 200)
+        {
+            this.redenemy.setVelocityX(50);
+        }
+
+        if (this.redenemy2.y >= 220)
+        {
+            this.redenemy2.setVelocityY(-50);
+        }
+        else if (this.redenemy2.y <= 20)
+        {
+            this.redenemy2.setVelocityY(50);
+        }
+
+    
     }
 
-    destroyghost(player2, port){
+    destroyghost(player2, port, redenemy, redenemy2){
         player2.disableBody(true, true);
     }
 }

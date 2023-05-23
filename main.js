@@ -12,7 +12,8 @@ const config = {
             //debug: true
         }
     },
-    scene: [ SHGamesIntro, OpeningCutscene, GameMenu, level1, level2, level3, Reset]
+    //scene:[ level5, level6, Reset]
+    scene: [ SHGamesIntro, OpeningCutscene, GameMenu, level1, level2, level3, level4, level5, level6, Reset]
 };
 
 const game = new Phaser.Game(config);
